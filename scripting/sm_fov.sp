@@ -2,47 +2,50 @@
 #include <sdktools>
 
 #pragma semicolon 1
+#pragma newdecls required
 
-#define PLUGIN_VERSION "1.1.0"
 #define DEFAULT_FOV 75
 
-new g_Fov[MAXPLAYERS+1] = DEFAULT_FOV;
-new g_CFov[MAXPLAYERS+1] = DEFAULT_FOV;
+char usage[] = "sm_fov <#userid|name> <value>";
+int g_Fov[MAXPLAYERS+1] = DEFAULT_FOV;
+int g_CFov[MAXPLAYERS+1] = DEFAULT_FOV;
 
-public Plugin:myinfo =
+public Plugin myinfo =
 {
     name = "[SM] Field of View",
     description = "Allows a client to modify their FOV.",
     author = "B3none",
-    version = PLUGIN_VERSION,
+    version = "1.1.0",
     url = "https://github.com/b3none"
 };
 
-public OnPluginStart()
+public void OnPluginStart()
 {
-    RegAdminCmd("sm_fov", Command_Fov, ADMFLAG_SLAY, "sm_fov <#userid|name> <value>");
-    
-    CreateConVar("sm_fov_version", PLUGIN_VERSION, PLUGIN_NAME, FCVAR_PLUGIN|FCVAR_NOTIFY);
+    RegAdminCmd("sm_fov", Command_Fov, ADMFLAG_SLAY, usage);
     
     HookEvent("player_spawn", Player_Spawn, EventHookMode_PostNoCopy);
 }
 
-public Action:Command_Fov(client, args)
+public Action Command_Fov(int client, int args)
 {
     if (args < 2)
     {
-        ReplyToCommand(client, "[SM] Usage: sm_fov <#userid|name> [value]");
+        ReplyToCommand(client, usage);
+        
         return Plugin_Handled;
     }
 
-    decl String:arg[65];
+    char arg[65];
     GetCmdArg(1, arg, sizeof(arg));
-    decl String:Sarg2[65];
+    
+    char Sarg2[65];
     GetCmdArg(2, Sarg2, sizeof(Sarg2));
-    new arg2 = StringToInt(Sarg2);
+    
+    int arg2 = StringToInt(Sarg2);
 
-    decl String:target_name[MAX_TARGET_LENGTH];
-    decl target_list[MAXPLAYERS], target_count, bool:tn_is_ml;
+    char target_name[MAX_TARGET_LENGTH];
+    int target_list[MAXPLAYERS], target_count;
+    bool tn_is_ml;
 
     if ((target_count = ProcessTargetString(
             arg,
@@ -54,12 +57,17 @@ public Action:Command_Fov(client, args)
             sizeof(target_name),
             tn_is_ml)) <= 0)
     {
-        if (IsValidClient(client)) ReplyToTargetError(client, target_count);
+        if (IsValidClient(client))
+        {
+        	ReplyToTargetError(client, target_count);
+        }
+        
         return Plugin_Handled;
     }
 
-    for (new i = 0; i < target_count; i++) {
-        new target = target_list[i];
+    for (int i = 0; i < target_count; i++)
+    {
+        int target = target_list[i];
         if (IsValidClient(target)) {
             g_Fov[target] = arg2;
         }
@@ -77,23 +85,35 @@ public Action:Command_Fov(client, args)
     return Plugin_Handled;
 }
 
-public Action:Player_Spawn(Handle:hEvent, String:strEventName[], bool:bDontBroadcast)
+public Action Player_Spawn(Handle hEvent, char[] strEventName, bool bDontBroadcast)
 {
-    new client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+    int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
     g_CFov[client] = g_Fov[client];
     SetEntProp(client, Prop_Send, "m_iFOV", g_CFov[client]);
     SetEntProp(client, Prop_Send, "m_iDefaultFOV", g_CFov[client]);
 }
 
-public OnGameFrame()
+public void OnGameFrame()
 {
-    for (new i = 1; i <= MaxClients; i++) {
-        if (IsValidClient(i) && IsPlayerAlive(i)) {
-            new fov = g_CFov[i];
-            if (fov != g_Fov[i]) {
-                new fov2 = fov + (g_Fov[i] - fov)/4;
-                if (fov2 == fov && g_Fov[i] > fov2) fov2 += 1;
-                if (fov2 == fov && g_Fov[i] < fov2) fov2 -= 1;
+    for (int i = 1; i <= MaxClients; i++)
+    {
+        if (IsValidClient(i) && IsPlayerAlive(i))
+        {
+            int fov = g_CFov[i];
+            if (fov != g_Fov[i])
+            {
+                int fov2 = fov + (g_Fov[i] - fov) / 4;
+                
+                if (fov2 == fov && g_Fov[i] > fov2)
+                {
+                	fov2 += 1;
+                }
+                
+                if (fov2 == fov && g_Fov[i] < fov2)
+                {
+                	fov2 -= 1;
+                }
+                
                 g_CFov[i] = fov2;
                 SetEntProp(i, Prop_Send, "m_iFOV", g_CFov[i]);
                 SetEntProp(i, Prop_Send, "m_iDefaultFOV", g_CFov[i]);
@@ -102,20 +122,22 @@ public OnGameFrame()
     }
 }
 
-stock bool:IsValidClient(iClient) {
+stock bool IsValidClient(int iClient)
+{
     if (iClient <= 0) return false;
     if (iClient > MaxClients) return false;
     if (!IsClientConnected(iClient)) return false;
     return IsClientInGame(iClient);
 }
 
-public OnClientPutInServer(client) {
+public void OnClientPutInServer(int client)
+{
     g_Fov[client] = DEFAULT_FOV;
     g_CFov[client] = DEFAULT_FOV;
-    
 }
 
-public OnClientDisconnect(client) {
+public void OnClientDisconnect(int client)
+{
     g_Fov[client] = DEFAULT_FOV;
     g_CFov[client] = DEFAULT_FOV;
 }
