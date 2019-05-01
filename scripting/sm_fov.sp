@@ -75,11 +75,11 @@ public Action Command_Fov(int client, int args)
 
     if (tn_is_ml)
     {
-        ShowActivity2(client, "[SM] ", "Changed FoV on target", target_name);
+        ShowActivity2(client, "[SM] ", "Changed FOV on target", target_name);
     }
     else
     {
-        ShowActivity2(client, "[SM] ", "Changed FoV on target", "_s", target_name);
+        ShowActivity2(client, "[SM] ", "Changed FOV on target", "_s", target_name);
     }
 
     return Plugin_Handled;
@@ -88,7 +88,9 @@ public Action Command_Fov(int client, int args)
 public Action Player_Spawn(Handle hEvent, char[] strEventName, bool bDontBroadcast)
 {
     int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+    
     g_CFov[client] = g_Fov[client];
+    
     SetEntProp(client, Prop_Send, "m_iFOV", g_CFov[client]);
     SetEntProp(client, Prop_Send, "m_iDefaultFOV", g_CFov[client]);
 }
@@ -122,14 +124,6 @@ public void OnGameFrame()
     }
 }
 
-stock bool IsValidClient(int iClient)
-{
-    if (iClient <= 0) return false;
-    if (iClient > MaxClients) return false;
-    if (!IsClientConnected(iClient)) return false;
-    return IsClientInGame(iClient);
-}
-
 public void OnClientPutInServer(int client)
 {
     g_Fov[client] = DEFAULT_FOV;
@@ -140,4 +134,9 @@ public void OnClientDisconnect(int client)
 {
     g_Fov[client] = DEFAULT_FOV;
     g_CFov[client] = DEFAULT_FOV;
+}
+
+stock bool IsValidClient(int client)
+{
+    return client > 0 && client <= MaxClients && IsClientConnected(client) && IsClientInGame(client);
 }
