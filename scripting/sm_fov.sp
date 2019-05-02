@@ -9,7 +9,7 @@
 #define MAX_FOV 120
 #define MESSAGE_PREFIX "[\x02Redline\x01]"
 
-char usage[] = "sm_fov <value>";
+char usage[] = "sm_fov <75 - 120>";
 int g_Fov[MAXPLAYERS + 1] = DEFAULT_FOV;
 int g_CFov[MAXPLAYERS + 1] = DEFAULT_FOV;
 
@@ -45,7 +45,7 @@ public Action Command_Fov(int client, int args)
     
     if (!IsValidFOV(fov))
     {
-    	ReplyToCommand(client, "%s Please enter a valid FOV value.", MESSAGE_PREFIX);
+    	ReplyToCommand(client, "%s %s", MESSAGE_PREFIX, usage);
     }
     else if (IsValidClient(client))
     {
