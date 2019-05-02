@@ -10,8 +10,8 @@
 #define MESSAGE_PREFIX "[\x02Redline\x01]"
 
 char usage[] = "sm_fov <value>";
-int g_Fov[MAXPLAYERS+1] = DEFAULT_FOV;
-int g_CFov[MAXPLAYERS+1] = DEFAULT_FOV;
+int g_Fov[MAXPLAYERS + 1] = DEFAULT_FOV;
+int g_CFov[MAXPLAYERS + 1] = DEFAULT_FOV;
 
 public Plugin myinfo =
 {
@@ -112,7 +112,7 @@ public void OnClientDisconnect(int client)
 
 bool IsValidFOV(int fov)
 {
-	return (fov > MIN_FOV) && (fov < MAX_FOV);
+	return (fov >= MIN_FOV) && (fov <= MAX_FOV);
 }
 
 stock bool IsValidClient(int client)
