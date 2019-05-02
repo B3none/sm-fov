@@ -33,7 +33,7 @@ public Action Command_Fov(int client, int args)
 {
     if (args < 1)
     {
-        ReplyToCommand(client, "%s %s", MESSAGE_PREFIX, usage);
+        PrintToChat(client, "%s %s", MESSAGE_PREFIX, usage);
         
         return Plugin_Handled;
     }
@@ -45,12 +45,12 @@ public Action Command_Fov(int client, int args)
     
     if (!IsValidFOV(fov))
     {
-    	ReplyToCommand(client, "%s %s", MESSAGE_PREFIX, usage);
+    	PrintToChat(client, "%s %s", MESSAGE_PREFIX, usage);
     }
     else if (IsValidClient(client))
     {
         g_Fov[client] = fov;
-        ReplyToCommand(client, "%s Your FOV has been updated.", MESSAGE_PREFIX);
+        PrintToChat(client, "%s Your FOV has been updated.", MESSAGE_PREFIX);
     }
 
     return Plugin_Handled;
