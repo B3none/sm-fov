@@ -5,6 +5,7 @@
 #pragma newdecls required
 
 #define DEFAULT_FOV 90
+#define MIN_FOV 75
 #define MAX_FOV 120
 #define MESSAGE_PREFIX "[\x02Redline\x01]"
 
@@ -32,7 +33,7 @@ public Action Command_Fov(int client, int args)
 {
     if (args < 1)
     {
-        ReplyToCommand(client, usage);
+        ReplyToCommand(client, "%s %s", MESSAGE_PREFIX, usage);
         
         return Plugin_Handled;
     }
@@ -42,12 +43,15 @@ public Action Command_Fov(int client, int args)
     
     int fov = StringToInt(arg);
     
-    if (IsValidClient(client))
+    if (!IsValidFOV(fov))
+    {
+    	ReplyToCommand(client, "%s Please enter a valid FOV value.", MESSAGE_PREFIX);
+    }
+    else if (IsValidClient(client))
     {
         g_Fov[client] = fov;
+        ReplyToCommand(client, "%s Your FOV has been updated.", MESSAGE_PREFIX);
     }
-
-    ReplyToCommand(client, "%s Your FOV has been updated.", MESSAGE_PREFIX);
 
     return Plugin_Handled;
 }
@@ -104,6 +108,11 @@ public void OnClientDisconnect(int client)
 {
     g_Fov[client] = DEFAULT_FOV;
     g_CFov[client] = DEFAULT_FOV;
+}
+
+bool IsValidFOV(int fov)
+{
+	return (fov > MIN_FOV) && (fov < MAX_FOV);
 }
 
 stock bool IsValidClient(int client)
