@@ -1,3 +1,4 @@
+// https://forums.alliedmods.net/showthread.php?p=1259466
 #include <sourcemod>
 #include <sdktools>
 
@@ -7,7 +8,7 @@
 #define DEFAULT_FOV 90
 #define MIN_FOV 75
 #define MAX_FOV 120
-#define MESSAGE_PREFIX "[\x02Redline\x01]"
+#define MESSAGE_PREFIX "[\x04FOV\x01]"
 
 char usage[] = "sm_fov <75 - 120>";
 int g_Fov[MAXPLAYERS + 1] = DEFAULT_FOV;
